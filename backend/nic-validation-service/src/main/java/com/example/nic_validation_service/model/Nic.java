@@ -3,15 +3,25 @@ package com.example.nic_validation_service.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 //import java.time.Period;
 
-@Entity //To create objcts
+@Entity //points to JPA entity and maps class to atable 
+@Table(name = "nic_store")  // Maps this entity to the nic_store table
+
 public class Nic {
     @Id
-    
+    @Column(name= "nic_no", length=12, nullable = false )
     private String nic_no; //primary Key
+
+    @Column(name= "Gender" , length=7 )
     private String gender;
+
+    @Column(name= "birthDate")
     private LocalDate birthDate;
+
+    @Column(name = "age")
     private int age;
 
     // Getters and Setters

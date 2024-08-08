@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/nics")
 public abstract class NicController {
     @Autowired
-    private NicService nicService;
+    private  NicService nicService;
 
     @PostMapping("/upload")
     public List<Nic> uploadCsvFiles(@RequestParam("files") MultipartFile[] files) {

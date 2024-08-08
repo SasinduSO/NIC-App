@@ -2,8 +2,8 @@ package com.example.nic_validation_service.service;
 
 import com.example.nic_validation_service.exception.InvalidNicException;
 import com.example.nic_validation_service.model.Nic;
-//import com.example.nic_validation_service.repository.NicRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
+import com.example.nic_validation_service.repository.NicRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,6 +13,13 @@ import java.util.List;
 
 @Service // for creating objects
 public class NicService {
+
+    //SQL passer
+    private NicRepository nicRepository;
+
+    public NicService(NicRepository nicRepository) {
+        this.nicRepository = nicRepository;
+    }
 
     // To get and return list of nic numbers from csv
     public List<Nic> parseNicsFromCsv(List<String> nicNumbers) {
@@ -33,7 +40,7 @@ public class NicService {
             }
 
             nics.add(nic); // adding to list of objects
-
+            saveNic( nic);
         }
         return nics; // return the lust
     }
@@ -66,6 +73,7 @@ public class NicService {
             LocalDate birthDate = calculateBirthDate(year, dayOfYear);
             nic.setBirthDate(birthDate);
             nic.setAge(calculateAge(birthDate));
+            
 
         } catch (NumberFormatException e) {
             throw new InvalidNicException("Invalid Nic Format Detected:" + nicNumber);
@@ -116,6 +124,27 @@ public class NicService {
     private int calculateAge(LocalDate birthDate) {
 
         return Period.between(birthDate,LocalDate.now()).getYears();
+    }
+
+    //save nic to database
+    public Nic saveNic(Nic nic) {
+        return nicRepository.save(nic);
+    }
+
+    // Get all NIC records from the database
+    public List<Nic> getAllNics() {
+        return nicRepository.findAll();
+    }
+
+     // Get a specific NIC record by NIC number
+     public Nic getNicById(String nic_no) {
+        return nicRepository.findById(nic_no)
+            .orElseThrow(() -> new InvalidNicException("NIC not found"));
+    }
+
+    // Delete a NIC record by NIC number
+    public void deleteNicById(String nic_no) {
+        nicRepository.deleteById(nic_no);
     }
 
     /*
