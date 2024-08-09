@@ -1,6 +1,5 @@
 package com.example.nic_validation_service.controller;
 
-
 import com.example.nic_validation_service.model.Nic;
 import com.example.nic_validation_service.service.NicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/nics")
-public abstract class NicController {
+public class NicController {
     @Autowired
-    private  NicService nicService;
+    private NicService nicService;
 
     @PostMapping("/upload")
     public List<Nic> uploadCsvFiles(@RequestParam("files") MultipartFile[] files) {
@@ -32,5 +31,10 @@ public abstract class NicController {
             }
         }
         return nicService.parseNicsFromCsv(nicNumbers);
+    }
+
+    @GetMapping("/test")
+    public String testEndpoint() {
+        return "API is working!";
     }
 }
