@@ -24,6 +24,9 @@ public class Nic {
     @Column(name = "age")
     private int age;
 
+    @Column(name = "file_name")
+    private String fileName;
+
     // Getters and Setters
 
     public void setNic_no(String nic_no){
@@ -55,5 +58,13 @@ public class Nic {
 
     public int getAge(){
         return age;
+    }
+
+    public void setFileName(String fileName){
+        this.fileName = fileName ;
+    }
+
+    public String getFileName(){
+        return fileName;
     }
 }

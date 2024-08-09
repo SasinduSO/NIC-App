@@ -1,7 +1,9 @@
 package com.example.nic_validation_service.service;
 
 import com.example.nic_validation_service.exception.InvalidNicException;
+import com.example.nic_validation_service.model.InvalidNic;
 import com.example.nic_validation_service.model.Nic;
+import com.example.nic_validation_service.repository.InvalidRepository;
 import com.example.nic_validation_service.repository.NicRepository;
 
 import org.springframework.stereotype.Service;
@@ -11,26 +13,37 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
+//import javax.print.DocFlavor.STRING;
+
 @Service // for creating objects
 public class NicService {
 
     //SQL passer
     private NicRepository nicRepository;
+    private InvalidRepository invalidRepository;
 
-    public NicService(NicRepository nicRepository) {
+    //Constructor
+    public NicService(NicRepository nicRepository, InvalidRepository invalidRepository) {
         this.nicRepository = nicRepository;
+        this.invalidRepository=invalidRepository;
     }
 
     // To get and return list of nic numbers from csv
-    public List<Nic> parseNicsFromCsv(List<String> nicNumbers) {
+    public List<Nic> parseNicsFromCsv(List<String> nicNumbers, String filename) {
 
-        List<Nic> nics = new ArrayList<>(); // creates a new list to hold nic numbers
+        List<Nic> nics = new ArrayList<>(); // creates a new list to hold coorectnic numbers
+        List<String> errmsgs = new ArrayList<>();
+
 
         // reading csv(now an array) until end of array
         for (String nicNumber : nicNumbers) {
+            try{
 
             Nic nic = new Nic(); // new object for each iteration
             nic.setNic_no(nicNumber);
+            nic.setFileName(filename); // Set the filename
+
+
             if (nicNumber.length() == 10) {
                 parseOldFormatNic(nic); // passing to old to parse
             } else if (nicNumber.length() == 12) {
@@ -41,10 +54,22 @@ public class NicService {
 
             nics.add(nic); // adding to list of objects
             saveNic( nic);
+
+        }catch(InvalidNicException e){
+            saveInvalid(nicNumber,filename);
+            errmsgs.add(e.getMessage());
+            System.err.println("Error in format of ID:"+ nicNumber + "--"+ e.getMessage());
         }
-        return nics; // return the lust
+        }
+        DisplayInvalidNic(errmsgs); //due to inability to return two values from one classs
+        return nics ; // return the lust
+        //return errmsgs;
+
     }
 
+    public List<String> DisplayInvalidNic(List<String> errmsgs){
+        return errmsgs;
+    }
     // abstraction methids
     private void parseOldFormatNic(Nic nic) {
 
@@ -129,6 +154,14 @@ public class NicService {
     //save nic to database
     public Nic saveNic(Nic nic) {
         return nicRepository.save(nic);
+    }
+
+    //saving invalid nic
+    public InvalidNic saveInvalid(String nicNumber, String filename){
+        InvalidNic inic = new InvalidNic();
+        inic.setNic_no(nicNumber);
+        inic.setFileName(filename);
+        return invalidRepository.save(inic);
     }
 
     // Get all NIC records from the database
