@@ -6,7 +6,9 @@ import com.example.nic_validation_service.model.Nic;
 import com.example.nic_validation_service.repository.InvalidRepository;
 import com.example.nic_validation_service.repository.NicRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -18,15 +20,34 @@ import java.util.List;
 @Service // for creating objects
 public class NicService {
 
-    //SQL passer
+    //API Passers
+    private final RestTemplate restTemplate;
+    @Autowired
+    public NicService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public String getStatusFromManagementService() {
+        String managementServiceUrl = "http://localhost:8081/api/status";
+        return restTemplate.getForObject(managementServiceUrl, String.class);
+    }
+
+
+    //SQL passers
     private NicRepository nicRepository;
     private InvalidRepository invalidRepository;
 
     //Constructor
-    public NicService(NicRepository nicRepository, InvalidRepository invalidRepository) {
+    public NicService(NicRepository nicRepository, InvalidRepository invalidRepository, RestTemplate restTemplate) {
         this.nicRepository = nicRepository;
         this.invalidRepository=invalidRepository;
+        this.restTemplate= restTemplate;
     }
+
+    
+
+
+
 
     // To get and return list of nic numbers from csv
     public List<Nic> parseNicsFromCsv(List<String> nicNumbers, String filename) {
@@ -179,6 +200,8 @@ public class NicService {
     public void deleteNicById(String nic_no) {
         nicRepository.deleteById(nic_no);
     }
+
+
 
     /*
      * private void identifyGender(int dayOfYear,Nic nic){

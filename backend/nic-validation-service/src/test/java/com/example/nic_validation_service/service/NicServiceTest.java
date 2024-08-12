@@ -68,9 +68,16 @@ class NicServiceTest {
     }
 
     @Test
-    void testParseNicsFromCsv_InvalidFormat() {
-        List<String> nicNumbers = Arrays.asList("12345");
+public void testParseNicsFromCsv_InvalidFormat() {
+    List<String> invalidNicNumbers = Arrays.asList("invalidnic");
+    String filename = "testfile.csv";
 
-        assertThrows(InvalidNicException.class, () -> nicService.parseNicsFromCsv(nicNumbers, filename));
+    try {
+        nicService.parseNicsFromCsv(invalidNicNumbers, filename);
+        fail("Expected InvalidNicException to be thrown");
+    } catch (InvalidNicException e) {
+        // Test passes if exception is caught
     }
+}
+
 }

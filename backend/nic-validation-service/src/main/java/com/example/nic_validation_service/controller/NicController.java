@@ -46,8 +46,9 @@ public class NicController {
         return allNics;
     }
 
-    @GetMapping("/test")
-    public String testEndpoint() {
-        return "API is working!";
+    @GetMapping("/status")
+    public String getStatusFromManagementService() {
+        return nicService.getStatusFromManagementService();
     }
+    
 }
