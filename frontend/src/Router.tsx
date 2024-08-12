@@ -4,6 +4,7 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import Login from './shared/Login'; 
+import Home from './User/Home';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
         path: '/',
         element: <Login />, // Default page (login form)
       },
+      {
+        path: '/Home',
+        element: <Home/> //home route
+      }
       /*
       {
         path: '/dashboard',

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';
 
 import {
@@ -10,22 +12,59 @@ import {
 }
   from 'mdb-react-ui-kit';
 function Login() {
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Hook to handle navigation
+  // Mark the function as async to use await inside
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post('http://localhost:8082/api/users/login', {
+        username,
+        password
+      });
+
+      // Assuming the response has a token or success message
+      if (response.status === 200) {
+        // Redirect to another page after successful login
+        navigate('/Home'); // Redirect to the dashboard or another protected route
+      }
+    } catch (error) {
+      // Handle login errors here
+      setError('Invalid username or password');
+    }
+  };
+
+
   return (
-    <div className="login-page" style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center',background:'#138D75' }}>
+    <div className="login-page" style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#138D75' }}>
       <MDBContainer className="p-4 my-5 d-flex flex-column w-100" style={{ maxWidth: '400px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)' }}>
 
-        <MDBInput wrapperClass='mb-4' label='Username' id='form1' type='email' />
-        <MDBInput wrapperClass='mb-4' label='Password' id='form2' type='password' />
+      <form onSubmit={handleLogin}>
+        <MDBInput wrapperClass='mb-4' label='Username' id='form1' type='text' 
+        onChange={(e) => setUsername(e.target.value)} 
+        required
+        />
+        <MDBInput wrapperClass='mb-4' label='Password' id='form2' type='password'
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        />
 
         <div className="d-flex justify-content-between mx-3 mb-4">
           <a href="#!">Forgot password?</a>
         </div>
 
-        <MDBBtn className="mb-4 w-100">Sign in</MDBBtn>
+        <MDBBtn type="submit" className="mb-4 w-100">Sign in</MDBBtn>
+        </form>
+
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
 
         <div className="text-center">
           <p>Not a member? <a href="#!">Register</a></p>
-          
+
         </div>
 
       </MDBContainer>

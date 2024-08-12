@@ -13,10 +13,13 @@ public class User {
     @Column
     private String username;
 
-    @Column String password;
+    @Column
+    private String password;
+
+
 
       // Getters and Setters
-      public String getUsername() {
+    public String getUsername() {
         return username;
     }
 

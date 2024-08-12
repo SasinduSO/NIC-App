@@ -1,19 +1,19 @@
 package com.example.nic_validation_service.service;
 
-import com.example.nic_validation_service.exception.InvalidNicException;
-import com.example.nic_validation_service.model.InvalidNic;
-import com.example.nic_validation_service.model.Nic;
-import com.example.nic_validation_service.repository.InvalidRepository;
-import com.example.nic_validation_service.repository.NicRepository;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.nic_validation_service.exception.InvalidNicException;
+import com.example.nic_validation_service.model.InvalidNic;
+import com.example.nic_validation_service.model.Nic;
+import com.example.nic_validation_service.repository.InvalidRepository;
+import com.example.nic_validation_service.repository.NicRepository;
 
 //import javax.print.DocFlavor.STRING;
 
@@ -65,14 +65,11 @@ public class NicService {
             nic.setFileName(filename); // Set the filename
 
 
-            if (nicNumber.length() == 10) {
-                parseOldFormatNic(nic); // passing to old to parse
-            } else if (nicNumber.length() == 12) {
-                parseNewFormatNic(nic); // [passing ] to new to parse
-            } else {
-                throw new InvalidNicException("This is an Invalid NIC:" + nicNumber);
+            switch (nicNumber.length()) {
+                case 10 -> parseOldFormatNic(nic); // passing nic to old nicparser
+                case 12 -> parseNewFormatNic(nic); // passing nic to new nicparser
+                default -> throw new InvalidNicException("This is an Invalid NIC: " + nicNumber);
             }
-
             nics.add(nic); // adding to list of objects
             saveNic( nic);
 
