@@ -17,7 +17,8 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate(); // Hook to handle navigation
-  // Mark the function as async to use await inside
+ 
+  //async to get inof back
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -27,13 +28,13 @@ function Login() {
         password
       });
 
-      // Assuming the response has a token or success message
+      // catching response message token and reroute
       if (response.status === 200) {
-        // Redirect to another page after successful login
-        navigate('/Home'); // Redirect to the dashboard or another protected route
+        
+        navigate('/Home'); 
       }
     } catch (error) {
-      // Handle login errors here
+      // login error
       setError('Invalid username or password');
     }
   };
@@ -60,8 +61,8 @@ function Login() {
         <MDBBtn type="submit" className="mb-4 w-100">Sign in</MDBBtn>
         </form>
 
-        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}  
+        
         <div className="text-center">
           <p>Not a member? <a href="#!">Register</a></p>
 

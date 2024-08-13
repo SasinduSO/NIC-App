@@ -24,10 +24,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User loginRequest) {
 
-        // Log the received username and password
-        System.out.println("Received login request for username: " + loginRequest.getUsername());
-        System.out.println("Received password: " + loginRequest.getPassword()); // Be cautious about logging passwords in real applications
-
         try {
             User user = userService.findByUsername(loginRequest.getUsername());
             if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {

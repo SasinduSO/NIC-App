@@ -22,6 +22,7 @@ public class NicService {
 
     //API Passers
     private final RestTemplate restTemplate;
+
     @Autowired
     public NicService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -34,7 +35,9 @@ public class NicService {
 
 
     //SQL passers
+    @Autowired
     private NicRepository nicRepository;
+    @Autowired
     private InvalidRepository invalidRepository;
 
     //Constructor
@@ -182,10 +185,7 @@ public class NicService {
         return invalidRepository.save(inic);
     }
 
-    // Get all NIC records from the database
-    public List<Nic> getAllNics() {
-        return nicRepository.findAll();
-    }
+    
 
      // Get a specific NIC record by NIC number
      public Nic getNicById(String nic_no) {
