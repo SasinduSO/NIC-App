@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.nic_management_service.model.InvalidNic;
 import com.example.nic_management_service.model.NicM;
+import com.example.nic_management_service.repository.InvalidNicRep;
 import com.example.nic_management_service.repository.NicMRepository;
 
 
@@ -17,7 +19,12 @@ public class NicMService {
     //sql passers
     @Autowired
     private NicMRepository nicMRepository;
+
+    @Autowired
+    private InvalidNicRep iNicRep;
+
     //constructor
+
     //intialized list
    // List<NicM> stores = new ArrayList<>();
 
@@ -31,4 +38,11 @@ public class NicMService {
         return nicMRepository.findAll();
     }
 
+    public NicM saveNicM(NicM nic) {
+        return nicMRepository.save(nic);
+    }
+
+    public InvalidNic InvalidSave(InvalidNic inic){
+        return iNicRep.save(inic);
+    }
 }

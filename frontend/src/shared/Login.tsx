@@ -41,7 +41,19 @@ function Login() {
 
 
   return (
-    <div className="login-page" style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#138D75' }}>
+    
+    <div
+    className="login-page"
+    style={{
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#071952'
+    }}
+  >
+      <h1 className="text-3xl font-bold mb-4 text-white">Sri Lanka NIC-Validator</h1>
       <MDBContainer className="p-4 my-5 d-flex flex-column w-100" style={{ maxWidth: '400px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)' }}>
 
       <form onSubmit={handleLogin}>
@@ -70,6 +82,7 @@ function Login() {
 
       </MDBContainer>
     </div>
+    
   );
 }
 
