@@ -15,6 +15,8 @@ public class InvalidNic {
     @Column(name= "file_name")
     private String filename;
 
+    @Column(name= "error_msg")
+    private String errorMessage;
 
     //Getter and setters
 
@@ -31,6 +33,15 @@ public class InvalidNic {
 
     public String getFileName(){
         return filename;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    
     }
     
 

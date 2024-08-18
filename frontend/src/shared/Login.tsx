@@ -13,7 +13,7 @@ import {
   from 'mdb-react-ui-kit';
 function Login() {
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate(); // Hook to handle navigation
@@ -24,7 +24,7 @@ function Login() {
 
     try {
       const response = await axios.post('http://localhost:8082/api/users/login', {
-        username,
+        email,
         password
       });
 
@@ -35,7 +35,7 @@ function Login() {
       }
     } catch (error) {
       // login error
-      setError('Invalid username or password');
+      setError('Invalid Email or password');
     }
   };
 
@@ -57,8 +57,8 @@ function Login() {
       <MDBContainer className="p-4 my-5 d-flex flex-column w-100" style={{ maxWidth: '400px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)' }}>
 
       <form onSubmit={handleLogin}>
-        <MDBInput wrapperClass='mb-4' label='Username' id='form1' type='text' 
-        onChange={(e) => setUsername(e.target.value)} 
+        <MDBInput wrapperClass='mb-4' label='Email' id='form1' type='email' 
+        onChange={(e) => setEmail(e.target.value)} 
         required
         />
         <MDBInput wrapperClass='mb-4' label='Password' id='form2' type='password'
@@ -67,7 +67,7 @@ function Login() {
         />
 
         <div className="d-flex justify-content-between mx-3 mb-4">
-          <a href="#!">Forgot password?</a>
+          <a href="/Fgpass">Forgot password?</a>
         </div>
 
         <MDBBtn type="submit" className="mb-4 w-100">Sign in</MDBBtn>
@@ -76,7 +76,7 @@ function Login() {
         {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}  
         
         <div className="text-center">
-          <p>Not a member? <a href="#!">Register</a></p>
+          <p>Not a member? <a href="/register">Register</a></p>
 
         </div>
 

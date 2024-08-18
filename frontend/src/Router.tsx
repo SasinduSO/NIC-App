@@ -8,6 +8,8 @@ import Home from './User/Home';
 import Dashboard from './User/Dasboard';
 import DataView from './User/DataView';
 import Report from './User/Report';
+import ForgotPassword from './shared/ForgotPassword';
+import Register from './shared/RegisterForm'
 
 const router = createBrowserRouter([
   {
@@ -19,26 +21,38 @@ const router = createBrowserRouter([
         element: <Login />, // Default page (login form)
       },
       {
+        path: '/Fgpass',
+        element: <ForgotPassword/>, // forhot password pathwy
+      },
+      {
         path: '/Home',
         element: <Home/> //home route
       },
       
       {
         path: '/dashboard',
-        element: <Dashboard />, // Example of a protected user route
+        element: <Dashboard />, //dashbpard pathway
       },
       {
         path: '/dataView',
-        element: <DataView/>, // Example of a protected user route
+        element: <DataView/>, // Valid Nic view pathway
       },
       {
         path: '/report',
-        element: <Report/>, // Example of a protected user route
+        element: <Report/>, // Report pathwy
+      },
+      {
+        path: '/register',
+        element: <Register/>, // Register pathwy
       },
 
       
     ],
   },
+
+
+
+
 ]);
 
 const Router = () => {

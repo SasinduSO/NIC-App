@@ -10,21 +10,43 @@ import jakarta.persistence.Table;
 @Table(name="user_store")
 public class User {
     @Id
-    @Column
-    private String username;
+    @Column (name= "email", nullable=false)
+    private String email; 
 
-    @Column
+    @Column (name="password")
     protected String password;
 
 
-
-      // Getters and Setters
-    public String getUsername() {
-        return username;
+    @Column (name="resetToken")
+    private String resetToken;
+ 
+    @Column (name= "version")
+    private Integer version;
+ 
+    // Getters and Setters
+    public String getResetToken() {
+        return resetToken;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {

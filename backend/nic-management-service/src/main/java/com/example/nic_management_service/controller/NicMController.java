@@ -50,6 +50,7 @@ public class NicMController {
             InvalidNic iNicM = new InvalidNic();
             iNicM.setNic_no(inic.getNic_no());
             iNicM.setFileName(inic.getFileName());
+            iNicM.setErrorMessage(inic.getErrorMessage());
             nicMService.InvalidSave(iNicM);
         }
 
