@@ -21,4 +21,20 @@ public interface NicRepository extends JpaRepository<NicRecord, String> {
 
     @Query("SELECT n.fileName, COUNT(n) FROM NicRecord n GROUP BY n.fileName")
     List<Object[]> countRecordsByFileName();
+
+    // Query to count records by age ranges
+    @Query("SELECT " +
+        "CASE " +
+        "WHEN age BETWEEN 10 AND 20 THEN '10-20' " +
+        "WHEN age BETWEEN 20 AND 30 THEN '20-30' " +
+        "WHEN age BETWEEN 30 AND 40 THEN '30-40' " +
+        "WHEN age BETWEEN 40 AND 50 THEN '40-50' " +
+        "ELSE 'Above 60' END, COUNT(r) " +
+        "FROM NicRecord r GROUP BY CASE " +
+        "WHEN age BETWEEN 10 AND 20 THEN '10-20' " +
+        "WHEN age BETWEEN 20 AND 30 THEN '20-30' " +
+        "WHEN age BETWEEN 30 AND 40 THEN '30-40' " +
+        "WHEN age BETWEEN 40 AND 50 THEN '40-50' " +
+        "ELSE 'Above 60' END")
+    List<Object[]> countByAgeRanges();
 }

@@ -36,6 +36,10 @@ public class DashController {
         summary.put("maleUsers", dashboardService.getMaleUsers());
         summary.put("femaleUsers", dashboardService.getFemaleUsers());
         summary.put("recordsByFileName", dashboardService.getRecordsByFileName());
+        summary.put("totalInvalidRecords", dashboardService.getTotalInvalidRecords());
+        summary.put("invalidRecordsByFileName", dashboardService.getInvalidsByFileName());
+        summary.put("ageDistributionPercentages", dashboardService.getAgeDistributionPercentages());
+
         return summary;
     }
 
