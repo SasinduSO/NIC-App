@@ -4,6 +4,7 @@ import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, Title, Tooltip, Legend, ArcElement, PointElement } from 'chart.js';
 import CustomNavbar from '../shared/ustomNavbar'; // Fixed import path
 import Card from '../shared/Card';
+import Card2 from '../shared/Card2'; // Import Card2
 
 // Register necessary components
 ChartJS.register(
@@ -66,6 +67,7 @@ const Dashboard = () => {
         data: [summary.maleUsers, summary.femaleUsers],
         backgroundColor: ['#36A2EB', '#FF6384'],
         borderWidth: 1,
+        borderColor:'#000000'
       },
     ],
   };
@@ -78,6 +80,7 @@ const Dashboard = () => {
         data: Object.values(summary.recordsByFileName),
         backgroundColor: pieColors,
         hoverBackgroundColor: pieColors,
+        borderColor:'#000000'
       },
     ],
   };
@@ -90,6 +93,7 @@ const Dashboard = () => {
         data: Object.values(summary.invalidRecordsByFileName),
         backgroundColor: invalidPieColors,
         hoverBackgroundColor: invalidPieColors,
+        borderColor:'#000000'
       },
     ],
   };
@@ -102,9 +106,11 @@ const Dashboard = () => {
         data: Object.values(summary.ageDistributionPercentages),
         backgroundColor: '#000000',
         borderColor: '#FFD700',
-        borderWidth: 2,
+        borderWidth: 4,
         fill: false,
+        pointRadius: 8,
         tension: 0.5,
+
       },
     ],
   };
@@ -114,15 +120,15 @@ const Dashboard = () => {
       <CustomNavbar />
       <div className="flex-grow mt-20" style={{ overflow: 'auto' }}>
       
-        <div className="row mb-4">
-          <div className="col-lg-6 mb-4">
+        <div className="row justify-content-center mb-2">
+          <div className="col-lg-5 col-md-6 mb-2 ml-40">
             <Card title="Total Valid Records:">
               <div>
                 <h2 className="text-6xl">{summary.totalRecords}</h2>
               </div>
             </Card>
           </div>
-          <div className="col-lg-6 mb-4">
+          <div className="col-lg-5 col-md-6 mb-2">
             <Card title="Total Invalid Records:">
               <div>
                 <h2 className="text-6xl">{summary.totalInvalidRecords}</h2>
@@ -131,36 +137,36 @@ const Dashboard = () => {
           </div>
         </div>
       
-        <div className="row mb-4">
-          <div className="col-lg-4 col-md-6 mb-4">
-            <Card title="Records by File Name">
+        <div className="row  mb-2">
+          <div className="col-lg-4 col-md-6 mb-3 p-0">
+            <Card2 title="Records by File Name">
               <div style={{ height: '300px' }}>
                 <Pie data={pieData} options={chartOptions} />
               </div>
-            </Card>
+            </Card2>
           </div>
-          <div className="col-lg-4 col-md-6 mb-4">
-            <Card title="Gender Distribution">
+          <div className="col-lg-4 col-md-6 mb-3 p-0">
+            <Card2 title="Gender Distribution">
               <div style={{ height: '300px' }}>
                 <Bar data={barData} options={chartOptions} />
               </div>
-            </Card>
+            </Card2>
           </div>
-          <div className="col-lg-4 col-md-6 mb-4">
-            <Card title="Invalid Records by File Name">
+          <div className="col-lg-4 col-md-6 mb-3 p-0">
+            <Card2 title="Invalid Records by File Name">
               <div style={{ height: '300px' }}>
                 <Pie data={invalidPieData} options={chartOptions} />
               </div>
-            </Card>
+            </Card2>
           </div>
         </div>
         <div className="row mb-4">
           <div className="col-12">
-            <Card title="Age Distribution Percentages">
+            <Card2 title="Age Distribution Percentages">
               <div style={{ height: '400px', width: '100%' }}>
                 <Line data={ageBarData} options={chartOptions} />
               </div>
-            </Card>
+            </Card2>
           </div>
         </div>
       </div>
@@ -169,7 +175,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
 
 /*
  <Card title="Dashboard Summary">

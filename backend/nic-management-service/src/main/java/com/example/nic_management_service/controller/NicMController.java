@@ -28,6 +28,12 @@ public class NicMController {
 
     }
 
+    @GetMapping("/InvalidAll")
+    public List<InvalidNic> getAllInvalid(){
+
+        return nicMService.getAllInvalid();
+    }
+
     @PostMapping("/save")
     public ResponseEntity<Void> saveNic(@RequestBody List<NicM> nics) {
         for (NicM nic : nics) {

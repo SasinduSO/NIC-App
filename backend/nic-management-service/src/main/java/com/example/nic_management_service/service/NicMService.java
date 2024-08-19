@@ -38,6 +38,10 @@ public class NicMService {
         return nicMRepository.findAll();
     }
 
+    public List<InvalidNic> getAllInvalid(){
+        return iNicRep.findAll();
+    }
+
     public NicM saveNicM(NicM nic) {
         return nicMRepository.save(nic);
     }

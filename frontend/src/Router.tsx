@@ -10,6 +10,7 @@ import DataView from './User/DataView';
 import Report from './User/Report';
 import ForgotPassword from './shared/ForgotPassword';
 import Register from './shared/RegisterForm'
+import Invalid from './User/InvalidTable'
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: '/dataView',
         element: <DataView/>, // Valid Nic view pathway
+      },
+      {
+        path: '/InvalidView',
+        element: <Invalid/>, // Register pathwy
       },
       {
         path: '/report',
