@@ -1,20 +1,41 @@
-// src/User/ReportGenerator.tsx
 import React, { useState } from 'react';
 import CustomNavbar from '../shared/ustomNavbar';
+import Checkbox from '@mui/material/Checkbox';
 
 const ReportGenerator: React.FC = () => {
   const [format, setFormat] = useState('pdf');
+  const [selectedSummaries, setSelectedSummaries] = useState({
+    includeFemaleNics: true,
+    includeMaleNics: true,
+    includeTotalRecords: true,
+    includeInvalidRecords: true,
+  });
 
   const handleFormatChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFormat(event.target.value);
   };
 
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedSummaries({
+      ...selectedSummaries,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
   const handleGenerateReport = async () => {
+    const queryString = new URLSearchParams({
+      format,
+      includeFemaleNics: selectedSummaries.includeFemaleNics.toString(),
+      includeMaleNics: selectedSummaries.includeMaleNics.toString(),
+      includeTotalRecords: selectedSummaries.includeTotalRecords.toString(),
+      includeInvalidRecords: selectedSummaries.includeInvalidRecords.toString(),
+    }).toString();
+
     try {
-      const response = await fetch(`http://localhost:8083/api/dashboard/generate-report?format=${format}`, {
+      const response = await fetch(`http://localhost:8083/api/dashboard/generate-report?${queryString}`, {
         method: 'GET',
       });
-  
+
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -33,40 +54,75 @@ const ReportGenerator: React.FC = () => {
 
   return (
     <div className="bg-[#071952]"
-    style={{
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}
+      style={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}
     >
-    <CustomNavbar />
-    
-    <div className="container mx-auto p-6 mt-20"> {/* Added mt-20 for margin top */}
-      <h2 className="text-2xl font-bold mb-4 text-white">Generate Report</h2>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <label htmlFor="format" className="block text-lg font-medium mb-2">Select File Format:</label>
-        <select
-          id="format"
-          value={format}
-          onChange={handleFormatChange}
-          className="mb-4 p-2 border border-gray-300 rounded-md"
-        >
-          <option value="pdf">PDF</option>
-          <option value="csv">CSV</option>
-          <option value="xlsx">Excel</option>
-        </select>
-        <button
-          onClick={handleGenerateReport}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          Generate Report
-        </button>
+      <CustomNavbar />
+
+      <div className="container mx-auto p-6 mt-20">
+        <h2 className="text-2xl font-bold mb-4 text-white">Generate Report</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <label htmlFor="format" className="block text-lg font-medium mb-2">Select File Format:</label>
+          <select
+            id="format"
+            value={format}
+            onChange={handleFormatChange}
+            className="mb-4 p-2 border border-gray-300 rounded-md"
+          >
+            <option value="pdf">PDF</option>
+            <option value="csv">CSV</option>
+            <option value="xlsx">Excel</option>
+          </select>
+          
+          <div>
+            <label>
+              <Checkbox
+                name="includeFemaleNics"
+                checked={selectedSummaries.includeFemaleNics}
+                onChange={handleCheckboxChange}
+              />
+              Total Female NIC Records
+            </label>
+            <label>
+              <Checkbox
+                name="includeMaleNics"
+                checked={selectedSummaries.includeMaleNics}
+                onChange={handleCheckboxChange}
+              />
+              Total Male NIC Records
+            </label>
+            <label>
+              <Checkbox
+                name="includeTotalRecords"
+                checked={selectedSummaries.includeTotalRecords}
+                onChange={handleCheckboxChange}
+              />
+              Total Valid Records
+            </label>
+            <label>
+              <Checkbox
+                name="includeInvalidRecords"
+                checked={selectedSummaries.includeInvalidRecords}
+                onChange={handleCheckboxChange}
+              />
+              Total Invalid Records
+            </label>
+          </div>
+          
+          <button
+            onClick={handleGenerateReport}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Generate Report
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  
   );
 };
 

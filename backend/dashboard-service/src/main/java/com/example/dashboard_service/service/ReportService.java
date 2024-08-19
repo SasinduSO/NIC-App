@@ -25,19 +25,17 @@ public class ReportService {
     @Autowired
     private DashService dashService;
 
-    public ByteArrayInputStream generateReport(String format) throws IOException {
-      
+    public ByteArrayInputStream generateReport(String format, boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) throws IOException {
         try {
-            System.out.println("Generating report in format: " + format);
             switch (format.toLowerCase()) {
                 case "pdf" -> {
-                    return generatePdfReport();
+                    return generatePdfReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords);
                 }
                 case "csv" -> {
-                    return generateCsvReport();
+                    return generateCsvReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords);
                 }
                 case "xlsx" -> {
-                    return generateXlsxReport();
+                    return generateXlsxReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords);
                 }
                 default -> throw new IllegalArgumentException("Invalid format: " + format);
             }
@@ -46,7 +44,7 @@ public class ReportService {
         }
     }
 
-    private ByteArrayInputStream generatePdfReport() {
+    private ByteArrayInputStream generatePdfReport(boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
     
         try (PDDocument document = new PDDocument()) {
@@ -61,15 +59,26 @@ public class ReportService {
                 contentStream.showText("NIC Report");
                 contentStream.endText();
     
-                // Add report details
+                // Add selected report details
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
                 contentStream.beginText();
                 contentStream.newLineAtOffset(100, 725);
-                contentStream.showText("Total Records: " + dashService.getTotalRecords());
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Male Users: " + dashService.getMaleUsers());
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Female Users: " + dashService.getFemaleUsers());
+                if (includeTotalRecords) {
+                    contentStream.showText("Total Records: " + dashService.getTotalRecords());
+                    contentStream.newLineAtOffset(0, -15);
+                }
+                if (includeMaleNics) {
+                    contentStream.showText("Male Users: " + dashService.getMaleUsers());
+                    contentStream.newLineAtOffset(0, -15);
+                }
+                if (includeFemaleNics) {
+                    contentStream.showText("Female Users: " + dashService.getFemaleUsers());
+                    contentStream.newLineAtOffset(0, -15);
+                }
+                if (includeInvalidRecords) {
+                    contentStream.showText("Invalid Records: " + dashService.getTotalInvalidRecords());
+                    contentStream.newLineAtOffset(0, -15);
+                }
                 contentStream.endText();
     
                 // Draw table headers
@@ -151,7 +160,7 @@ public class ReportService {
     
     
 
-    private ByteArrayInputStream generateCsvReport() {
+    private ByteArrayInputStream generateCsvReport(boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         StringBuilder builder = new StringBuilder();
 
@@ -166,6 +175,19 @@ public class ReportService {
                     .append(record.getFileName()).append('\n');
         }
 
+        if (includeTotalRecords) {
+            builder.append("Total Records,").append(dashService.getTotalRecords()).append('\n');
+        }
+        if (includeMaleNics) {
+            builder.append("Male Users,").append(dashService.getMaleUsers()).append('\n');
+        }
+        if (includeFemaleNics) {
+            builder.append("Female Users,").append(dashService.getFemaleUsers()).append('\n');
+        }
+        if (includeInvalidRecords) {
+            builder.append("Invalid Records,").append(dashService.getTotalInvalidRecords()).append('\n');
+        }
+
         try {
             out.write(builder.toString().getBytes());
         } catch (IOException e) {
@@ -175,7 +197,7 @@ public class ReportService {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private ByteArrayInputStream generateXlsxReport() throws IOException {
+    private ByteArrayInputStream generateXlsxReport(boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("NIC Report");
@@ -187,7 +209,7 @@ public class ReportService {
         header.createCell(2).setCellValue("Birth Date");
         header.createCell(3).setCellValue("Age");
         header.createCell(4).setCellValue("File Name");
-    
+
         // Fetch records from the service
         List<NicRecord> records = dashService.getAllRecords();
         int rowIdx = 1;
@@ -198,6 +220,28 @@ public class ReportService {
             row.createCell(2).setCellValue(record.getBirthDate().toString());
             row.createCell(3).setCellValue(record.getAge());
             row.createCell(4).setCellValue(record.getFileName());
+        }
+
+        int summaryRowIdx = rowIdx + 1;
+        if (includeTotalRecords) {
+            Row row = sheet.createRow(summaryRowIdx++);
+            row.createCell(0).setCellValue("Total Records");
+            row.createCell(1).setCellValue(dashService.getTotalRecords());
+        }
+        if (includeMaleNics) {
+            Row row = sheet.createRow(summaryRowIdx++);
+            row.createCell(0).setCellValue("Male Users");
+            row.createCell(1).setCellValue(dashService.getMaleUsers());
+        }
+        if (includeFemaleNics) {
+            Row row = sheet.createRow(summaryRowIdx++);
+            row.createCell(0).setCellValue("Female Users");
+            row.createCell(1).setCellValue(dashService.getFemaleUsers());
+        }
+        if (includeInvalidRecords) {
+            Row row = sheet.createRow(summaryRowIdx++);
+            row.createCell(0).setCellValue("Invalid Records");
+            row.createCell(1).setCellValue(dashService.getTotalInvalidRecords());
         }
     
         try {

@@ -42,11 +42,22 @@ public class DashController {
 
         return summary;
     }
-
     @GetMapping("/generate-report")
-    public ResponseEntity<byte[]> generateReport(@RequestParam String format) throws IOException {
-        
-        ByteArrayInputStream report = reportService.generateReport(format);
+    public ResponseEntity<byte[]> generateReport(
+        @RequestParam String format,
+        @RequestParam(required = false) boolean includeFemaleNics,
+        @RequestParam(required = false) boolean includeMaleNics,
+        @RequestParam(required = false) boolean includeTotalRecords,
+        @RequestParam(required = false) boolean includeInvalidRecords
+    ) throws IOException {
+    
+        ByteArrayInputStream report = reportService.generateReport(
+            format, 
+            includeFemaleNics, 
+            includeMaleNics, 
+            includeTotalRecords, 
+            includeInvalidRecords
+        );
     
         HttpHeaders headers = new HttpHeaders();
         String contentType;
@@ -76,4 +87,5 @@ public class DashController {
                 .headers(headers)
                 .body(report.readAllBytes());
     }
+    
 }
