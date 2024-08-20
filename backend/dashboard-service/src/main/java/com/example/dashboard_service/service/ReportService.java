@@ -1,8 +1,10 @@
 package com.example.dashboard_service.service;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.dashboard_service.exception.ReportGenerationException;
+import com.example.dashboard_service.model.NicInvalid;
 import com.example.dashboard_service.model.NicRecord;
 @Service
 public class ReportService {
@@ -25,11 +28,18 @@ public class ReportService {
     @Autowired
     private DashService dashService;
 
-    public ByteArrayInputStream generateReport(String format, boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) throws IOException {
+    public ByteArrayInputStream generateReport(
+    String format, 
+    boolean includeFemaleNics, 
+    boolean includeMaleNics, 
+    boolean includeTotalRecords, 
+    boolean includeInvalidRecords, 
+    boolean includeTotalInvalidRecords, 
+    boolean includeTotalValidRecords) throws IOException {
         try {
             switch (format.toLowerCase()) {
                 case "pdf" -> {
-                    return generatePdfReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords);
+                    return generatePdfReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords,includeTotalInvalidRecords,includeTotalValidRecords);
                 }
                 case "csv" -> {
                     return generateCsvReport(includeFemaleNics, includeMaleNics, includeTotalRecords, includeInvalidRecords);
@@ -44,121 +54,269 @@ public class ReportService {
         }
     }
 
-    private ByteArrayInputStream generatePdfReport(boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-    
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                // Set font for the title
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
-                contentStream.beginText();
-                contentStream.newLineAtOffset(100, 750);
-                contentStream.showText("NIC Report");
-                contentStream.endText();
-    
-                // Add selected report details
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.beginText();
-                contentStream.newLineAtOffset(100, 725);
-                if (includeTotalRecords) {
-                    contentStream.showText("Total Records: " + dashService.getTotalRecords());
-                    contentStream.newLineAtOffset(0, -15);
-                }
-                if (includeMaleNics) {
-                    contentStream.showText("Male Users: " + dashService.getMaleUsers());
-                    contentStream.newLineAtOffset(0, -15);
-                }
-                if (includeFemaleNics) {
-                    contentStream.showText("Female Users: " + dashService.getFemaleUsers());
-                    contentStream.newLineAtOffset(0, -15);
-                }
-                if (includeInvalidRecords) {
-                    contentStream.showText("Invalid Records: " + dashService.getTotalInvalidRecords());
-                    contentStream.newLineAtOffset(0, -15);
-                }
-                contentStream.endText();
-    
-                // Draw table headers
-                float tableYStart = 680;
-                float rowHeight = 15f;
-                float tableWidth = 450f;
-                float yPosition = tableYStart;
-    
-                // Draw table border
-                contentStream.setLineWidth(1f);
-                contentStream.moveTo(100, yPosition);
-                contentStream.lineTo(100 + tableWidth, yPosition);
-                contentStream.stroke();
-    
-                // Draw table headers
-                contentStream.beginText();
-                contentStream.newLineAtOffset(100, yPosition - 12);
-                contentStream.showText("NIC Number");
-                contentStream.newLineAtOffset(100 + 100, yPosition - 12);
-                contentStream.showText("Gender");
-                contentStream.newLineAtOffset(100 + 200, yPosition - 12);
-                contentStream.showText("Birth Date");
-                contentStream.newLineAtOffset(100 + 300, yPosition - 12);
-                contentStream.showText("Age");
-                contentStream.newLineAtOffset(100 + 400, yPosition - 12);
-                contentStream.showText("File Name");
-                contentStream.endText();
-    
-                // Draw header border
-                yPosition -= rowHeight;
-                contentStream.moveTo(100, yPosition);
-                contentStream.lineTo(100 + tableWidth, yPosition);
-                contentStream.stroke();
-    
-                // Draw table content
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                List<NicRecord> records = dashService.getAllRecords();
-                for (NicRecord record : records) {
-                    contentStream.beginText();
-                    contentStream.newLineAtOffset(100, yPosition - 12);
-                    contentStream.showText(record.getNic_no());
-                    contentStream.newLineAtOffset(100 + 100, yPosition - 12);
-                    contentStream.showText(record.getGender());
-                    contentStream.newLineAtOffset(100 + 200, yPosition - 12);
-                    contentStream.showText(record.getBirthDate().toString());
-                    contentStream.newLineAtOffset(100 + 300, yPosition - 12);
-                    contentStream.showText(String.valueOf(record.getAge()));
-                    contentStream.newLineAtOffset(100 + 400, yPosition - 12);
-                    contentStream.showText(record.getFileName());
-                    contentStream.endText();
-                    yPosition -= rowHeight;
-    
-                    // Draw row border
-                    contentStream.moveTo(100, yPosition);
-                    contentStream.lineTo(100 + tableWidth, yPosition);
-                    contentStream.stroke();
-                }
-    
-                // Draw bottom border
-                contentStream.moveTo(100, yPosition);
-                contentStream.lineTo(100 + tableWidth, yPosition);
-                contentStream.stroke();
-    
-            } catch (IOException e) {
-                throw new ReportGenerationException("Error generating PDF report", e);
+    private ByteArrayInputStream generatePdfReport(
+    boolean includeFemaleNics,
+    boolean includeMaleNics,
+    boolean includeTotalRecords,
+    boolean includeInvalidRecords,
+    boolean includeTotalInvalidRecords,
+    boolean includeTotalValidRecords) {
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+    try (PDDocument document = new PDDocument()) {
+        PDPage page = new PDPage();
+        document.addPage(page);
+
+        float margin = 72; // 1 inch margin
+        float yPosition = page.getMediaBox().getHeight() - margin;
+        float rowHeight = 20f;
+        float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
+        float headerHeight = 25f;
+
+        try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+            // Title and date
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 24);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(margin, yPosition);
+            contentStream.showText("NIC REPORT");
+            contentStream.endText();
+            contentStream.moveTo(margin, yPosition - 5);
+            contentStream.lineTo(page.getMediaBox().getWidth() - margin, yPosition - 5);
+            contentStream.stroke();
+
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(margin, yPosition - 20);
+            contentStream.showText("Generated on: " + java.time.LocalDateTime.now().toString());
+            contentStream.endText();
+
+            yPosition -= 40;
+
+            // Add summary lines
+            if (includeTotalRecords) {
+                yPosition = addSummaryLine(contentStream, "Total Records", (int) dashService.getTotalRecords(), yPosition, margin);
             }
-    
-            try {
-                document.save(out);
-            } catch (IOException e) {
-                throw new ReportGenerationException("Error saving PDF report", e);
+            if (includeMaleNics) {
+                yPosition = addSummaryLine(contentStream, "Male Users", (int) dashService.getMaleUsers(), yPosition, margin);
             }
-        } catch (IOException e) {
-            throw new ReportGenerationException("Error creating PDF document", e);
+            if (includeFemaleNics) {
+                yPosition = addSummaryLine(contentStream, "Female Users", (int) dashService.getFemaleUsers(), yPosition, margin);
+            }
+            if (includeInvalidRecords) {
+                yPosition = addSummaryLine(contentStream, "Invalid Records", (int) dashService.getTotalInvalidRecords(), yPosition, margin);
+            }
+
+            
+            
+            // Draw valid NIC table
+            if (includeTotalValidRecords) {
+                List<NicRecord> validRecords = dashService.getAllRecords();
+                String[] validHeaders = {"NIC Number", "Gender", "Birth Date", "Age", "File Name"};
+                yPosition = drawTable(contentStream, yPosition, margin, validRecords, validHeaders, document, rowHeight, headerHeight, tableWidth);
+            }
+            
+            // Draw invalid NIC table
+            if (includeTotalInvalidRecords) {
+                List<NicInvalid> invalidRecords = dashService.getAllInvalidRecords();
+                String[] invalidHeaders = {"NIC Number", "File Name", "Error Message"};
+                yPosition = drawTable(contentStream, yPosition, margin, invalidRecords, invalidHeaders, document, rowHeight, headerHeight, tableWidth);
+            }
+            
         }
-    
-        return new ByteArrayInputStream(out.toByteArray());
+
+        document.save(out);
+    } catch (IOException e) {
+        throw new ReportGenerationException("Error generating PDF report", e);
     }
-    
-    
+
+    return new ByteArrayInputStream(out.toByteArray());
+}
+private float addSummaryLine(PDPageContentStream contentStream, String label, int value, float yPosition, float margin) throws IOException {
+    contentStream.setStrokingColor(Color.BLACK);
+    contentStream.setNonStrokingColor(Color.LIGHT_GRAY);
+    contentStream.addRect(margin, yPosition - 14, 200, 14); // Increase height for padding
+    contentStream.stroke();
+    contentStream.setNonStrokingColor(Color.BLACK);
+    contentStream.beginText();
+    contentStream.newLineAtOffset(margin + 2, yPosition - 10); // Adjust vertical offset
+    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+    contentStream.showText(label + ": ");
+    contentStream.endText();
+
+    contentStream.beginText();
+    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+    contentStream.setNonStrokingColor(Color.BLUE);
+    contentStream.newLineAtOffset(margin + 150, yPosition - 10); // Adjust vertical offset
+    contentStream.showText(String.valueOf(value));
+    contentStream.endText();
+
+    return yPosition - 25; // Increase space between lines
+}
+
+private float drawTable(PDPageContentStream contentStream, float yPosition, float margin, List<?> records, String[] headers, PDDocument document, float rowHeight, float headerHeight, float tableWidth) throws IOException {
+    float cellMargin = 5f;
+    float[] columnWidths = calculateColumnWidths(headers.length, tableWidth);
+
+    // Draw table headers
+    contentStream.setNonStrokingColor(Color.decode("#071952"));
+    contentStream.addRect(margin, yPosition, tableWidth, headerHeight);
+    contentStream.fill();
+    contentStream.setNonStrokingColor(Color.WHITE);
+    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+
+    // Position headers based on column widths
+    float textXPosition = margin + cellMargin;
+    contentStream.beginText();
+    contentStream.newLineAtOffset(textXPosition, yPosition + headerHeight / 2 - 6);
+    for (int i = 0; i < headers.length; i++) {
+        contentStream.showText(headers[i]);
+        textXPosition += columnWidths[i]; // Increment position by column width
+        contentStream.newLineAtOffset(columnWidths[i], 0);
+    }
+    contentStream.endText();
+
+    yPosition -= headerHeight;
+
+    // Draw table rows
+    boolean isAlternate = false;
+    for (Object record : records) {
+        if (yPosition < margin + rowHeight) { // Check if new page is needed
+            contentStream.close();
+            PDPage newPage = new PDPage();
+            document.addPage(newPage);
+            contentStream = new PDPageContentStream(document, newPage);
+            yPosition = newPage.getMediaBox().getHeight() - margin;
+
+            // Redraw table headers
+            contentStream.setNonStrokingColor(Color.decode("#071952"));
+            contentStream.addRect(margin, yPosition, tableWidth, headerHeight);
+            contentStream.fill();
+            contentStream.setNonStrokingColor(Color.WHITE);
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+
+            textXPosition = margin + cellMargin;
+            contentStream.beginText();
+            contentStream.newLineAtOffset(textXPosition, yPosition + headerHeight / 2 - 6);
+            for (int i = 0; i < headers.length; i++) {
+                contentStream.showText(headers[i]);
+                textXPosition += columnWidths[i]; // Increment position by column width
+                contentStream.newLineAtOffset(columnWidths[i], 0);
+            }
+            contentStream.endText();
+
+            yPosition -= headerHeight;
+        }
+
+        contentStream.setNonStrokingColor(isAlternate ? new Color(0xF6, 0xF7, 0xC4) : new Color(0xFD, 0xFF, 0xAB));
+        contentStream.addRect(margin, yPosition, tableWidth, rowHeight);
+        contentStream.fill();
+
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+
+        // Position text within each column
+        textXPosition = margin + cellMargin;
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textXPosition, yPosition + rowHeight / 2 - 5);
+
+        // Handle different record types and null values
+        if (record instanceof NicRecord nicRecord) {
+            contentStream.showText(nicRecord.getNic_no() != null ? nicRecord.getNic_no() : "");
+            textXPosition += columnWidths[0];
+            contentStream.newLineAtOffset(columnWidths[0], 0);
+
+            contentStream.showText(nicRecord.getGender() != null ? nicRecord.getGender() : "");
+            textXPosition += columnWidths[1];
+            contentStream.newLineAtOffset(columnWidths[1], 0);
+
+            contentStream.showText(nicRecord.getBirthDate() != null ? nicRecord.getBirthDate().toString() : "");
+            textXPosition += columnWidths[2];
+            contentStream.newLineAtOffset(columnWidths[2], 0);
+
+            contentStream.showText(nicRecord.getAge() >= 0 ? String.valueOf(nicRecord.getAge()) : ""); // Default to empty string if age is negative or invalid
+            textXPosition += columnWidths[3];
+            contentStream.newLineAtOffset(columnWidths[3], 0);
+
+            contentStream.showText(nicRecord.getFileName() != null ? nicRecord.getFileName() : "");
+
+        } else if (record instanceof NicInvalid nicInvalid) {
+            contentStream.showText(nicInvalid.getNic_no() != null ? nicInvalid.getNic_no() : "");
+            textXPosition += columnWidths[0];
+            contentStream.newLineAtOffset(columnWidths[0], 0);
+
+            contentStream.showText(nicInvalid.getFileName() != null ? nicInvalid.getFileName() : "");
+            textXPosition += columnWidths[1];
+            contentStream.newLineAtOffset(columnWidths[1], 0);
+
+            contentStream.showText(nicInvalid.getErrorMessage() != null ? nicInvalid.getErrorMessage() : ""); // Handle null for error message
+        } else {
+            // Log or handle unexpected record type
+            System.err.println("Unexpected record type: " + record.getClass().getName());
+        }
+        contentStream.endText();
+
+        yPosition -= rowHeight;
+        isAlternate = !isAlternate;
+    }
+
+    return yPosition;
+}
+
+
+
+
+
+private float getTextLinesHeight(String text, float columnWidth, PDPageContentStream contentStream) throws IOException {
+    if (text == null || text.isEmpty()) return 10f; // Default line height if text is empty
+
+    float fontSize = 10f;
+    PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    contentStream.setFont(font, fontSize);
+
+    String[] lines = splitTextIntoLines(text, columnWidth, font, fontSize);
+    return lines.length * (fontSize + 2); // Line height plus padding
+}
+
+private String[] splitTextIntoLines(String text, float columnWidth, PDType1Font font, float fontSize) throws IOException {
+    List<String> lines = new ArrayList<>();
+    if (text != null && !text.isEmpty()) {
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        for (String word : words) {
+            String testLine = line.length() > 0 ? line + " " + word : word;
+            if (font.getStringWidth(testLine) / 1000 * fontSize > columnWidth) {
+                lines.add(line.toString());
+                line = new StringBuilder(word);
+            } else {
+                line.append(line.length() > 0 ? " " : "").append(word);
+            }
+        }
+        if (line.length() > 0) {
+            lines.add(line.toString());
+        }
+    }
+    return lines.toArray(new String[0]);
+}
+
+private float getMax(float[] values) {
+    float max = values[0];
+    for (float value : values) {
+        if (value > max) max = value;
+    }
+    return max;
+}
+
+private float[] calculateColumnWidths(int numColumns, float tableWidth) {
+    float[] columnWidths = new float[numColumns];
+    float baseWidth = tableWidth / numColumns;
+    for (int i = 0; i < numColumns; i++) {
+        columnWidths[i] = baseWidth;
+    }
+    return columnWidths;
+}
+
+
 
     private ByteArrayInputStream generateCsvReport(boolean includeFemaleNics, boolean includeMaleNics, boolean includeTotalRecords, boolean includeInvalidRecords) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

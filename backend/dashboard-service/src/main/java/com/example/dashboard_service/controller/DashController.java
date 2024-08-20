@@ -48,7 +48,9 @@ public class DashController {
         @RequestParam(required = false) boolean includeFemaleNics,
         @RequestParam(required = false) boolean includeMaleNics,
         @RequestParam(required = false) boolean includeTotalRecords,
-        @RequestParam(required = false) boolean includeInvalidRecords
+        @RequestParam(required = false) boolean includeInvalidRecords,
+        @RequestParam(required = false) boolean includeTotalInvalidRecords,
+        @RequestParam(required = false) boolean includeTotalValidRecords
     ) throws IOException {
     
         ByteArrayInputStream report = reportService.generateReport(
@@ -56,7 +58,9 @@ public class DashController {
             includeFemaleNics, 
             includeMaleNics, 
             includeTotalRecords, 
-            includeInvalidRecords
+            includeInvalidRecords,
+            includeTotalInvalidRecords,
+            includeTotalValidRecords
         );
     
         HttpHeaders headers = new HttpHeaders();

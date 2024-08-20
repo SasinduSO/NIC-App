@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.dashboard_service.model.NicInvalid;
 import com.example.dashboard_service.model.NicRecord;
 import com.example.dashboard_service.repository.NicInvalidRep;
 import com.example.dashboard_service.repository.NicRepository;
@@ -38,6 +39,10 @@ public class DashService {
     
     public List<NicRecord> getAllRecords() {
         return nicRecordRepository.findAll();
+    }
+
+    public List<NicInvalid> getAllInvalidRecords() {
+        return nicInvalidRep.findAll();
     }
 
     public Map<String, Long> getRecordsByFileName() {

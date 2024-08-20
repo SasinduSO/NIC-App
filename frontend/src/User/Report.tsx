@@ -9,6 +9,8 @@ const ReportGenerator: React.FC = () => {
     includeMaleNics: true,
     includeTotalRecords: true,
     includeInvalidRecords: true,
+    includeTotalInvalidRecords: true,
+    includeTotalValidRecords: true
   });
 
   const handleFormatChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -29,6 +31,8 @@ const ReportGenerator: React.FC = () => {
       includeMaleNics: selectedSummaries.includeMaleNics.toString(),
       includeTotalRecords: selectedSummaries.includeTotalRecords.toString(),
       includeInvalidRecords: selectedSummaries.includeInvalidRecords.toString(),
+      includeTotalInvalidRecords: selectedSummaries.includeTotalInvalidRecords.toString(),
+      includeTotalValidRecords: selectedSummaries.includeTotalValidRecords.toString(),
     }).toString();
 
     try {
@@ -86,31 +90,52 @@ const ReportGenerator: React.FC = () => {
                 checked={selectedSummaries.includeFemaleNics}
                 onChange={handleCheckboxChange}
               />
-              Total Female NIC Records
+              Include Total Number of Female NIC Records
             </label>
+            <br/>
             <label>
               <Checkbox
                 name="includeMaleNics"
                 checked={selectedSummaries.includeMaleNics}
                 onChange={handleCheckboxChange}
               />
-              Total Male NIC Records
+              Include Total Number of Male NIC Records
             </label>
+            <br/>
             <label>
               <Checkbox
                 name="includeTotalRecords"
                 checked={selectedSummaries.includeTotalRecords}
                 onChange={handleCheckboxChange}
               />
-              Total Valid Records
+              Include Total Numver of Valid Records
             </label>
+            <br/>
             <label>
               <Checkbox
                 name="includeInvalidRecords"
                 checked={selectedSummaries.includeInvalidRecords}
                 onChange={handleCheckboxChange}
               />
-              Total Invalid Records
+              Include Total Numver of Invalid Records
+            </label>
+            <br/>
+            <label>
+              <Checkbox
+                name="includeTotalValidRecords"
+                checked={selectedSummaries.includeTotalValidRecords}
+                onChange={handleCheckboxChange}
+              />
+              Include Valid NIC Records Table
+            </label>
+            <br/>
+            <label>
+              <Checkbox
+                name="includeTotalInvalidRecords"
+                checked={selectedSummaries.includeTotalInvalidRecords}
+                onChange={handleCheckboxChange}
+              />
+              Include Invalid NIC Records Table
             </label>
           </div>
           
